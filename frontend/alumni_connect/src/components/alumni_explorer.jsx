@@ -3,17 +3,14 @@ import {
   Search, 
   MapPin, 
   Briefcase, 
-  GraduationCap, 
   Filter, 
   ChevronDown, 
   ChevronUp, 
   MessageCircle, 
-  User,
-  ExternalLink
+  User
 } from 'lucide-react';
 
 // --- Mock Data ---
-
 const MOCK_ALUMNI = [
   {
     id: 1,
@@ -23,9 +20,11 @@ const MOCK_ALUMNI = [
     batch: "2019",
     location: "Bangalore, India",
     image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    coverImage: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=800&q=80",
     skills: ["Azure", "C#", ".NET Core", "System Design"],
     experience: "5 Years",
-    domain: "Engineering"
+    domain: "Engineering",
+    about: "Building scalable cloud solutions at Microsoft. Passionate about distributed systems and mentoring fresh graduates."
   },
   {
     id: 2,
@@ -35,9 +34,11 @@ const MOCK_ALUMNI = [
     batch: "2020",
     location: "Hyderabad, India",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    coverImage: "https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=800&q=80",
     skills: ["Product Strategy", "Analytics", "Agile", "UX"],
     experience: "4 Years",
-    domain: "Product"
+    domain: "Product",
+    about: "Transitioned from Engineering to Product. I love solving user problems and analyzing data trends."
   },
   {
     id: 3,
@@ -47,9 +48,11 @@ const MOCK_ALUMNI = [
     batch: "2021",
     location: "Seattle, USA",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    coverImage: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
     skills: ["Python", "Machine Learning", "AWS", "NLP"],
     experience: "3 Years",
-    domain: "Data Science"
+    domain: "Data Science",
+    about: "Data enthusiast working on Recommendation Engines. Happy to help students interested in AI/ML."
   },
   {
     id: 4,
@@ -59,9 +62,11 @@ const MOCK_ALUMNI = [
     batch: "2022",
     location: "Remote",
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    coverImage: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=800&q=80",
     skills: ["React", "TypeScript", "GraphQL", "Design Systems"],
     experience: "2 Years",
-    domain: "Engineering"
+    domain: "Engineering",
+    about: "Crafting beautiful user interfaces. Advocate for accessibility and modern web performance."
   },
   {
     id: 5,
@@ -71,9 +76,11 @@ const MOCK_ALUMNI = [
     batch: "2018",
     location: "Mumbai, India",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    coverImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80",
     skills: ["Financial Modeling", "Valuation", "Equity Research"],
     experience: "6 Years",
-    domain: "Finance"
+    domain: "Finance",
+    about: "Helping clients make informed investment decisions. Open to chatting about careers in Finance."
   },
   {
     id: 6,
@@ -83,9 +90,11 @@ const MOCK_ALUMNI = [
     batch: "2020",
     location: "London, UK",
     image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    coverImage: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80",
     skills: ["User Testing", "Figma", "Prototyping", "Qualitative Research"],
     experience: "4 Years",
-    domain: "Design"
+    domain: "Design",
+    about: "Understanding user behavior to drive product decisions. Let's talk about user-centric design."
   }
 ];
 
@@ -122,8 +131,6 @@ const FILTERS = [
   }
 ];
 
-// --- Components ---
-
 const FilterSection = ({ title, options, isOpenDefault = false }) => {
   const [isOpen, setIsOpen] = useState(isOpenDefault);
 
@@ -159,8 +166,11 @@ const FilterSection = ({ title, options, isOpenDefault = false }) => {
   );
 };
 
-const AlumniCard = ({ data }) => (
-  <div className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all duration-300 flex flex-col h-full group">
+const AlumniCard = ({ data, onClick }) => (
+  <div 
+    onClick={() => onClick(data)}
+    className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-100 hover:-translate-y-1 transition-all duration-300 flex flex-col h-full group cursor-pointer"
+  >
     {/* Card Header */}
     <div className="p-6 flex flex-col items-center text-center border-b border-slate-50 relative">
       <div className="w-24 h-24 rounded-full p-1 bg-linear-to-br from-indigo-50 to-slate-50 border border-slate-100 mb-3 shadow-inner relative group-hover:scale-105 transition-transform duration-300">
@@ -221,7 +231,8 @@ const AlumniCard = ({ data }) => (
   </div>
 );
 
-export default function AlumniExplorer() {
+// Accepts onViewProfile prop to communicate with the parent dashboard
+export default function AlumniExplorer({ onViewProfile }) {
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-sans text-slate-800 p-4 md:p-8">
       
@@ -300,11 +311,19 @@ export default function AlumniExplorer() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {MOCK_ALUMNI.map((alumni) => (
-                    <AlumniCard key={alumni.id} data={alumni} />
+                    <AlumniCard 
+                        key={alumni.id} 
+                        data={alumni} 
+                        onClick={onViewProfile} // Pass data up to parent
+                    />
                 ))}
                 {/* Duplicate mock data to fill grid for visual purposes */}
                 {MOCK_ALUMNI.slice(0, 2).map((alumni) => (
-                    <AlumniCard key={`dup-${alumni.id}`} data={{...alumni, id: `dup-${alumni.id}`}} />
+                    <AlumniCard 
+                        key={`dup-${alumni.id}`} 
+                        data={{...alumni, id: `dup-${alumni.id}`}} 
+                        onClick={onViewProfile} 
+                    />
                 ))}
             </div>
 

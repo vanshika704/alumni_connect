@@ -14,6 +14,7 @@ import {
   Coffee, 
   Calendar,
   ArrowRight,
+  ArrowLeft,
   Zap,
   Layout,
   Compass,
@@ -27,12 +28,15 @@ import {
   User,
   PanelLeftClose,
   PanelLeftOpen,
-  Menu
+  Menu,
+  Linkedin,
+  Mail
 } from 'lucide-react';
-import AlumniExplorer from '../components/alumni_explorer';
+import AlumniExplorer from '../../components/alumni_explorer';
+import AlumniProfile from './AlumniProfile';
+import Roadmaps from '../../components/Roadmaps';
 
-// --- MOCK DATA: DASHBOARD ---
-
+// --- MOCK DATA ---
 const STATS = [
   { label: "Mentors Connected", value: "12", icon: Users, color: "bg-blue-50 text-blue-600" },
   { label: "Communities Joined", value: "5", icon: MessageSquare, color: "bg-purple-50 text-purple-600" },
@@ -45,28 +49,27 @@ const ALUMNI_RECOMMENDATIONS = [
     name: "Arjun Mehta",
     role: "Senior Product Designer",
     company: "Google",
+    location: "Bangalore, India",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    coverImage: "https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=800&q=80",
     matchScore: 98,
     skills: ["UX Research", "Figma", "Prototyping"],
+    about: "I help companies build products that are easy to use and visually appealing. Mentoring students who are passionate about design systems.",
+    experience: "5 Years"
   },
   {
     id: 2,
     name: "Sarah Jenkins",
     role: "Software Engineer II",
     company: "Netflix",
+    location: "Los Gatos, USA",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+    coverImage: "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=800&q=80",
     matchScore: 94,
     skills: ["React", "Node.js", "System Design"],
-  },
-  {
-    id: 3,
-    name: "David Chen",
-    role: "Data Scientist",
-    company: "Spotify",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    matchScore: 89,
-    skills: ["Python", "ML", "Data Viz"],
-  },
+    about: "Full stack engineer with a love for scalability. Happy to guide students on cracking FAANG interviews.",
+    experience: "4 Years"
+  }
 ];
 
 const COMMUNITIES = [
@@ -105,7 +108,7 @@ const QUICK_ACCESS = [
   { label: "My Journey", icon: Map, color: "bg-blue-100 text-blue-600" },
 ];
 
-// --- SHARED HELPER COMPONENTS ---
+// --- HELPER COMPONENTS ---
 
 // eslint-disable-next-line no-unused-vars
 const SidebarItem = ({ icon: Icon, label, active, onClick, expanded }) => (
@@ -120,15 +123,11 @@ const SidebarItem = ({ icon: Icon, label, active, onClick, expanded }) => (
       }`}
   >
     <Icon size={20} strokeWidth={active ? 2.5 : 2} className="shrink-0" />
-    
-    {/* Label - Hidden when collapsed, visible when expanded */}
     <span className={`font-medium whitespace-nowrap overflow-hidden transition-all duration-300 ${
       expanded ? 'w-auto opacity-100' : 'w-0 opacity-0'
     }`}>
       {label}
     </span>
-
-    {/* Active Indicator Dot */}
     {active && expanded && <div className="ml-auto w-1.5 h-1.5 bg-white rounded-full shrink-0" />}
   </button>
 );
@@ -141,36 +140,17 @@ const MatchScoreRing = ({ score }) => {
   return (
     <div className="relative flex items-center justify-center w-12 h-12">
       <svg className="transform -rotate-90 w-12 h-12">
-        <circle
-          className="text-slate-100"
-          strokeWidth="3"
-          stroke="currentColor"
-          fill="transparent"
-          r={radius}
-          cx="24"
-          cy="24"
-        />
-        <circle
-          className="text-green-500 transition-all duration-1000 ease-out"
-          strokeWidth="3"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          stroke="currentColor"
-          fill="transparent"
-          r={radius}
-          cx="24"
-          cy="24"
-        />
+        <circle className="text-slate-100" strokeWidth="3" stroke="currentColor" fill="transparent" r={radius} cx="24" cy="24" />
+        <circle className="text-green-500 transition-all duration-1000 ease-out" strokeWidth="3" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" stroke="currentColor" fill="transparent" r={radius} cx="24" cy="24" />
       </svg>
       <span className="absolute text-[10px] font-bold text-slate-700">{score}%</span>
     </div>
   );
 };
 
-// --- PAGE VIEWS ---
+// --- PAGE VIEW: DASHBOARD HOME ---
 
-const DashboardHome = ({ setActiveTab }) => (
+const DashboardHome = ({ setActiveTab, onViewProfile }) => (
   <>
     <header className="sticky top-0 z-20 bg-[#F8FAFC]/80 backdrop-blur-md px-8 py-6 flex items-center justify-between">
       <div>
@@ -216,7 +196,11 @@ const DashboardHome = ({ setActiveTab }) => (
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ALUMNI_RECOMMENDATIONS.map((person) => (
-            <div key={person.id} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            <div 
+              key={person.id} 
+              onClick={() => onViewProfile(person)} // ADDED CLICK HANDLER
+              className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col cursor-pointer group"
+            >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex gap-4">
                   <img 
@@ -225,7 +209,7 @@ const DashboardHome = ({ setActiveTab }) => (
                     className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-md" 
                   />
                   <div>
-                    <h4 className="font-bold text-slate-900 text-lg leading-tight">{person.name}</h4>
+                    <h4 className="font-bold text-slate-900 text-lg leading-tight group-hover:text-neutral-600 transition-colors">{person.name}</h4>
                     <p className="text-sm text-slate-500 mt-1 font-medium">{person.role}</p>
                     <p className="text-xs text-slate-400">at {person.company}</p>
                   </div>
@@ -247,7 +231,7 @@ const DashboardHome = ({ setActiveTab }) => (
               </div>
 
               <button className="mt-auto w-full py-2.5 rounded-xl bg-neutral-600 text-white font-semibold text-sm hover:bg-neutral-700 active:scale-95 transition-all shadow-lg shadow-neutral-200 flex items-center justify-center gap-2">
-                Request Guidance <ArrowRight size={16} />
+                View Profile <ArrowRight size={16} />
               </button>
             </div>
           ))}
@@ -353,7 +337,7 @@ const DashboardHome = ({ setActiveTab }) => (
               <button 
                 key={idx}
                 onClick={() => {
-                    if(item.label === "Find Alumni") setActiveTab('Explore Alumni');
+                  if(item.label === "Find Alumni") setActiveTab('Explore Alumni');
                 }}
                 className={`flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 bg-white group ${idx === QUICK_ACCESS.length - 1 ? 'col-span-2 flex-row gap-3' : ''}`}
               >
@@ -387,21 +371,31 @@ const DashboardHome = ({ setActiveTab }) => (
 
 // --- MAIN SHELL COMPONENT ---
 
-// --- MAIN SHELL COMPONENT ---
-
-export default function StudentDashboard() {
+function StudentDashboard() {
   const [activeTab, setActiveTab] = useState('Dashboard');
-  // Sidebar State: Initially closed (false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedAlumni, setSelectedAlumni] = useState(null); // STATE FOR PROFILE VIEW
+
+  // Handler to open profile
+  const handleViewProfile = (alumni) => {
+    setSelectedAlumni(alumni);
+  };
 
   // Function to decide which content to render
   const renderContent = () => {
+    // Check if we are viewing a specific profile
+    if (selectedAlumni) {
+      return <AlumniProfile alumni={selectedAlumni} onBack={() => setSelectedAlumni(null)} />;
+    }
+
     switch (activeTab) {
         case 'Explore Alumni':
-            return <AlumniExplorer/>;
+            return <AlumniExplorer onViewProfile={handleViewProfile} />;
+             case 'Roadmap':
+            return <Roadmaps onViewProfile={handleViewProfile} />;
         case 'Dashboard':
         default:
-            return <DashboardHome setActiveTab={setActiveTab} />;
+            return <DashboardHome setActiveTab={setActiveTab} onViewProfile={handleViewProfile} />;
     }
   };
 
@@ -429,9 +423,8 @@ export default function StudentDashboard() {
             
             {/* Logo Section */}
             <div className={`flex items-center gap-3 transition-all duration-300 ${!isSidebarOpen && 'justify-center w-full'}`}>
-                <div className="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center shadow-md text-white shrink-0">
-                    <Compass size={20}   onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                />
+                <div className="w-8 h-8 bg-neutral-900 rounded-lg flex items-center justify-center shadow-md text-white shrink-0 cursor-pointer" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                    <Compass size={20} />
                 </div>
                 
                 {/* Text Label (Hidden when closed) */}
@@ -441,8 +434,6 @@ export default function StudentDashboard() {
                     AlumniConnect
                 </h1>
             </div>
-
-        
         </div>
 
         {/* Navigation Links */}
@@ -450,16 +441,16 @@ export default function StudentDashboard() {
           <SidebarItem 
             icon={Layout} 
             label="Dashboard" 
-            active={activeTab === 'Dashboard'} 
+            active={activeTab === 'Dashboard' && !selectedAlumni} 
             expanded={isSidebarOpen}
-            onClick={() => setActiveTab('Dashboard')}
+            onClick={() => { setActiveTab('Dashboard'); setSelectedAlumni(null); }}
           />
           <SidebarItem 
             icon={Search} 
             label="Explore Alumni" 
-            active={activeTab === 'Explore Alumni'} 
+            active={activeTab === 'Explore Alumni' && !selectedAlumni} 
             expanded={isSidebarOpen}
-            onClick={() => setActiveTab('Explore Alumni')}
+            onClick={() => { setActiveTab('Explore Alumni'); setSelectedAlumni(null); }}
           />
           <SidebarItem 
             icon={Users} 
@@ -488,6 +479,13 @@ export default function StudentDashboard() {
             active={activeTab === 'My Journey'} 
             expanded={isSidebarOpen}
             onClick={() => setActiveTab('My Journey')}
+          />
+           <SidebarItem 
+            icon={MapPin} 
+            label="Roadmap" 
+            active={activeTab === 'Roadmap'} 
+            expanded={isSidebarOpen}
+            onClick={() => setActiveTab('Roadmap')}
           />
         </nav>
 
@@ -518,3 +516,5 @@ export default function StudentDashboard() {
     </div>
   );
 }
+
+export default StudentDashboard;
