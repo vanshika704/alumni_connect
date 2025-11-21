@@ -1,21 +1,37 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+
+// --- Layout Imports ---
+
 
 // --- Page Imports ---
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
+
+// Student Pages
+import StudentDashboard from './pages/student/StudentDashboard';
 import AlumniProfile from './pages/student/AlumniProfile';
-import StudentDashboard from './pages/student/StudentDashboard'; // Ensure this file exists
+
+// Admin Pages
+import UniversityAdminDashboard from './pages/admin/UniversityAdminDashboard';
+
+// Alumni Pages
+import AlumniDashboard from './pages/alumni/AlumniDashboard';
+import WorkshopManager from './pages/alumni/WorkshopManager';
+import WorkshopCreator from './pages/alumni/WorkshopCreator';
+import StudentExplorer from './pages/alumni/StudentExplorer';
+import StudentRequests from './pages/alumni/studentRequests';
+import AlumniSettings from './pages/alumni/AlumniSettings';
+import Layout from './pages/alumni/Layout';
+import AlumniLayout from './pages/alumni/Layout';
+import AdminDashboard from './pages/admin/DashBoard';
 
 // --- 1. Landing Page Wrapper ---
 const LandingWrapper = () => {
   const navigate = useNavigate();
-
   const handleNavigateToAuth = (role, mode) => {
-    // FIX: Changed path from '/' to '/auth' so it actually goes to the login page
     navigate('/auth', { state: { role, mode } });
   };
-
   return <LandingPage onNavigate={handleNavigateToAuth} />;
 };
 
@@ -23,48 +39,21 @@ const LandingWrapper = () => {
 const LoginWrapper = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Default to student/login if no state is present (e.g., direct URL access)
   const { role, mode } = location.state || { role: 'student', mode: 'login' };
+
+  // This function simulates the logic after successful login
+  const handleLoginSuccess = (userRole) => {
+    if (userRole === 'alumni') navigate('/alumni'); // Goes to Alumni Dashboard (inside Sidebar)
+    else if (userRole === 'admin') navigate('/university');
+    else navigate('/student-dashboard');
+  };
 
   return (
     <LoginPage 
       initialRole={role} 
       initialMode={mode} 
-      onBack={() => navigate('/')} // Handle the "Home" button
-      // onLoginSuccess is handled internally by LoginPage using useNavigate
-    />
-  );
-};
-
-// --- 3. Student Dashboard Wrapper ---
-const DashboardWrapper = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    navigate('/');
-  };
-
-  const handleViewProfile = (alumniId) => {
-    navigate(`/profile/${alumniId}`);
-  };
-
-  return (
-    <StudentDashboard 
-      onLogout={handleLogout} 
-      onViewProfile={handleViewProfile} 
-    />
-  );
-};
-
-// --- 4. Profile Wrapper ---
-const ProfileWrapper = () => {
-  const navigate = useNavigate();
-  // In a real app, you would extract the ID here: const { id } = useParams(); 
-
-  return (
-    <AlumniProfile 
-      onBack={() => navigate('/student-dashboard')} 
+      onBack={() => navigate('/')}
+      onLoginSuccess={handleLoginSuccess} // Pass the navigation logic down
     />
   );
 };
@@ -72,25 +61,48 @@ const ProfileWrapper = () => {
 // --- Main App Component ---
 export default function App() {
   return (
+    <div className="min-h-screen bg-white font-sans">
+      <Routes>
+        
+        {/* --- Public Routes --- */}
+        <Route path="/" element={<LandingWrapper />} />
+        <Route path="/auth" element={<LoginWrapper />} />
 
-      <div className="min-h-screen bg-white font-sans">
-        <Routes>
-          {/* Route: Landing Page */}
-          <Route path="/" element={<LandingWrapper />} />
+        {/* --- Student Routes (Standalone) --- */}
+        <Route path="/student-dashboard" element={<StudentDashboard />} />
+        <Route path="/profile/:id" element={<AlumniProfile />} />
 
-          {/* Route: Authentication (Login/Register) */}
-          <Route path="/auth" element={<LoginWrapper />} />
+        {/* --- Admin Routes (Standalone) --- */}
+        <Route path="/university" element={<UniversityAdminDashboard />} />
+ <Route path="/admin" element={<AdminDashboard/>} />
+        {/* --- ALUMNI ROUTES (Protected & Nested in Sidebar) --- */}
+        {/* All routes inside here will have the Sidebar! */}
+        <Route path="/alumni" element={<AlumniLayout/>}>
+          
+          {/* Default: /alumni -> Dashboard */}
+          <Route index element={<AlumniDashboard />} />
+          
+          {/* /alumni/students -> Explorer */}
+          <Route path="students" element={<StudentExplorer />} />
+          
+          {/* /alumni/requests -> Requests */}
+          <Route path="requests" element={<StudentRequests />} />
+          
+          {/* /alumni/workshops -> Manager */}
+          <Route path="workshops" element={<WorkshopManager />} />
+          
+          {/* /alumni/create-workshop -> Creator */}
+          <Route path="create-workshop" element={<WorkshopCreator />} />
+          
+          {/* /alumni/settings -> Settings */}
+          <Route path="settings" element={<AlumniSettings />} />
+          
+        </Route>
 
-          {/* Route: Student Dashboard */}
-          <Route path="/student-dashboard" element={<DashboardWrapper />} />
+        {/* Catch-all for 404 */}
+        <Route path="*" element={<Navigate to="/" replace />} />
 
-          {/* Route: Alumni Dashboard (Placeholder) */}
-          <Route path="/alumni-dashboard" element={<div className="p-10 text-center">Alumni Dashboard Coming Soon</div>} />
-
-          {/* Route: Alumni Profile */}
-          <Route path="/profile/:id" element={<ProfileWrapper />} />
-        </Routes>
-      </div>
-  
+      </Routes>
+    </div>
   );
 }

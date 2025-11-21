@@ -32,9 +32,11 @@ import {
   Linkedin,
   Mail
 } from 'lucide-react';
-import AlumniExplorer from '../../components/alumni_explorer';
+import AlumniExplorer from './alumni_explorer';
 import AlumniProfile from './AlumniProfile';
-import Roadmaps from '../../components/Roadmaps';
+import StudentJourney from './StudentJourney';
+import WorkshopsModule from './Workshops';
+
 
 // --- MOCK DATA ---
 const STATS = [
@@ -391,8 +393,10 @@ function StudentDashboard() {
     switch (activeTab) {
         case 'Explore Alumni':
             return <AlumniExplorer onViewProfile={handleViewProfile} />;
-             case 'Roadmap':
-            return <Roadmaps onViewProfile={handleViewProfile} />;
+             case 'My Journey':
+            return <StudentJourney />;
+             case 'Workshops':
+            return <WorkshopsModule />;
         case 'Dashboard':
         default:
             return <DashboardHome setActiveTab={setActiveTab} onViewProfile={handleViewProfile} />;
@@ -480,13 +484,7 @@ function StudentDashboard() {
             expanded={isSidebarOpen}
             onClick={() => setActiveTab('My Journey')}
           />
-           <SidebarItem 
-            icon={MapPin} 
-            label="Roadmap" 
-            active={activeTab === 'Roadmap'} 
-            expanded={isSidebarOpen}
-            onClick={() => setActiveTab('Roadmap')}
-          />
+           
         </nav>
 
         {/* Logout Section */}
