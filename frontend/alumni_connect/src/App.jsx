@@ -25,6 +25,7 @@ import AlumniSettings from './pages/alumni/AlumniSettings';
 import Layout from './pages/alumni/Layout';
 import AlumniLayout from './pages/alumni/Layout';
 import AdminDashboard from './pages/admin/DashBoard';
+import { AuthProvider } from './context/AuthContext';
 
 // --- 1. Landing Page Wrapper ---
 const LandingWrapper = () => {
@@ -62,6 +63,7 @@ const LoginWrapper = () => {
 export default function App() {
   return (
     <div className="min-h-screen bg-white font-sans">
+      <AuthProvider>
       <Routes>
         
         {/* --- Public Routes --- */}
@@ -103,6 +105,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
 
       </Routes>
+      </AuthProvider>
     </div>
   );
 }

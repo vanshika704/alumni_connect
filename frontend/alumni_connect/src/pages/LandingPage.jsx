@@ -20,7 +20,7 @@ const RoleDropdown = ({ selected, onSelect }) => {
   const options = [
     { id: 'student', label: 'Join as Student', icon: <GraduationCap className="w-5 h-5" /> },
     { id: 'alumni', label: 'Join as Alumni', icon: <Briefcase className="w-5 h-5" /> },
-    { id: 'institute', label: 'Partner Institute', icon: <Building2 className="w-5 h-5" /> },
+   
   ];
 
   const current = options.find(o => o.id === selected) || options[0];
